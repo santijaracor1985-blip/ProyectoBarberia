@@ -3,6 +3,7 @@ package com.example.application.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.application.interfaces.Agendable;
 import com.example.application.models.Barbero;
@@ -18,7 +19,6 @@ public class CitaService implements Agendable {
     private List<Barbero> barberos = new ArrayList<>();
 
     public CitaService() {
-
         barberos.add(new Barbero("Carlos Freestyle", "111", List.of("freestyle")));
         barberos.add(new Barbero("Andrés Clásico", "222", List.of("corte")));
         barberos.add(new Barbero("Luis Colorista", "333", List.of("tinte")));
@@ -30,15 +30,10 @@ public class CitaService implements Agendable {
     public List<Barbero> obtenerBarberos() { return barberos; }
 
     public List<Barbero> obtenerBarberosPorServicio(String tipo) {
-
         List<Barbero> disponibles = new ArrayList<>();
-
         for (Barbero b : barberos) {
-            if (b.puedeHacer(tipo)) {
-                disponibles.add(b);
-            }
+            if (b.puedeHacer(tipo)) disponibles.add(b);
         }
-
         return disponibles;
     }
 
@@ -48,19 +43,15 @@ public class CitaService implements Agendable {
             throw new RuntimeException("Nombre requerido");
 
         Servicio servicio = obtenerServicio(tipo);
-
-        Barbero barbero = buscarBarberoDisponible(tipo);
+        Barbero barbero = buscarBarberoDisponible(tipo, fechaHora);
 
         if (barbero == null)
-            throw new RuntimeException("No hay barberos disponibles");
+            throw new RuntimeException("No hay barberos disponibles en esa fecha y hora");
 
         Cliente cliente = new Cliente(nombre, telefono);
-
         Cita cita = new Cita(cliente, barbero, servicio, fechaHora);
-
         citas.add(cita);
 
-        // 🔥 FACTURA CON BARBERO
         Factura factura = new Factura(
                 cliente.getNombre(),
                 servicio.getNombre(),
@@ -68,9 +59,7 @@ public class CitaService implements Agendable {
                 servicio.getPrecio(),
                 fechaHora.toString()
         );
-
         facturas.add(factura);
-
         return factura;
     }
 
@@ -85,9 +74,12 @@ public class CitaService implements Agendable {
         }
     }
 
-    private Barbero buscarBarberoDisponible(String tipo) {
+    private Barbero buscarBarberoDisponible(String tipo, LocalDateTime fechaHora) {
         for (Barbero b : barberos) {
-            if (b.puedeHacer(tipo)) return b;
+            boolean ocupado = citas.stream()
+                    .anyMatch(c -> c.getBarbero().equals(b) &&
+                                   c.getFechaHora().equals(fechaHora));
+            if (b.puedeHacer(tipo) && !ocupado) return b;
         }
         return null;
     }
@@ -95,5 +87,11 @@ public class CitaService implements Agendable {
     @Override
     public void agendarCita(Cita cita) {
         citas.add(cita);
+    }
+
+    public List<Cita> obtenerCitasPorBarbero(Barbero barbero) {
+        return citas.stream()
+                .filter(c -> c.getBarbero().equals(barbero))
+                .collect(Collectors.toList());
     }
 }
