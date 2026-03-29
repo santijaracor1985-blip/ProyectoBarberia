@@ -33,14 +33,13 @@ public class BarberiaView extends VerticalLayout {
 
     private CitaService servicio = new CitaService();
     private Div contenido = new Div();
-    private DatePicker fechaGlobal = new DatePicker("Fecha"); // Fecha seleccionada global
+    private DatePicker fechaGlobal = new DatePicker("Fecha");
 
     public BarberiaView() {
         setSizeFull();
         setPadding(false);
         setSpacing(false);
 
-        // 🌙 MODO OSCURO
         getElement().getThemeList().add("dark");
         getStyle()
             .set("background", "linear-gradient(135deg,#0f172a,#020617)")
@@ -51,7 +50,6 @@ public class BarberiaView extends VerticalLayout {
         contenido.setWidthFull();
         contenido.getStyle().set("padding", "30px");
 
-        // Fecha inicial hoy
         fechaGlobal.setValue(LocalDate.now());
         fechaGlobal.addValueChangeListener(e -> mostrarAgenda());
 
@@ -60,12 +58,11 @@ public class BarberiaView extends VerticalLayout {
         add(contenido);
     }
 
-    // 🔥 HEADER
     private Component crearHeader() {
         H2 nombre = new H2("INMANTIC BARBER");
         nombre.getStyle().set("color", "#D4AF37").set("margin", "0");
 
-        Image logo = new Image("https://cdn-icons-png.flaticon.com/512/921/921347.png", "logo");
+        Image logo = new Image("https://static.vecteezy.com/system/resources/thumbnails/017/375/307/small_2x/a-simple-but-powerful-black-and-white-logo-depicting-a-stylish-and-brutal-man-for-your-brand-vector.jpg", "logo");
         logo.setWidth("45px");
 
         HorizontalLayout left = new HorizontalLayout(logo, nombre);
@@ -106,7 +103,6 @@ public class BarberiaView extends VerticalLayout {
         return btn;
     }
 
-    // 📅 AGENDA
     private void mostrarAgenda() {
         contenido.removeAll();
         contenido.add(vistaAgenda());
@@ -116,6 +112,11 @@ public class BarberiaView extends VerticalLayout {
 
         TextField nombre = new TextField("Nombre");
         nombre.setWidthFull();
+
+        // 🔥 NUEVO: SEXO
+        ComboBox<String> sexo = new ComboBox<>("Sexo");
+        sexo.setItems("Masculino", "Femenino", "Otro");
+        sexo.setWidthFull();
 
         HorizontalLayout servicios = new HorizontalLayout();
         servicios.setSpacing(true);
@@ -153,7 +154,6 @@ public class BarberiaView extends VerticalLayout {
             servicios.add(chip);
         }
 
-        // Fecha para agendar
         fechaGlobal.setWidthFull();
 
         ComboBox<String> hora = new ComboBox<>("Hora");
@@ -181,16 +181,28 @@ public class BarberiaView extends VerticalLayout {
                     return;
                 }
 
+                // 🔥 VALIDACIÓN SEXO
+                if (sexo.getValue() == null) {
+                    Notification.show("Selecciona el sexo");
+                    return;
+                }
+
                 LocalDateTime fechaHora = LocalDateTime.of(
                     fechaGlobal.getValue(),
                     LocalTime.parse(hora.getValue())
                 );
 
-                servicio.agendar(nombre.getValue(), "000", seleccionado[0], fechaHora);
+                servicio.agendar(
+                    nombre.getValue(),
+                    "000",
+                    sexo.getValue(), // 🔥 NUEVO
+                    seleccionado[0],
+                    fechaHora
+                );
 
                 Notification.show("✅ Cita agendada");
 
-                mostrarAgenda(); // refresca la vista y agenda mini de barberos
+                mostrarAgenda();
 
             } catch (Exception ex) {
                 Notification.show(ex.getMessage());
@@ -199,6 +211,7 @@ public class BarberiaView extends VerticalLayout {
 
         FormLayout form = new FormLayout(
             nombre,
+            sexo, // 🔥 NUEVO
             new Div(new Span("Servicio"), servicios),
             barberoBox,
             fechaGlobal,
@@ -220,7 +233,6 @@ public class BarberiaView extends VerticalLayout {
             .set("border-radius","15px")
             .set("box-shadow","0 20px 40px rgba(0,0,0,0.7)");
 
-        // Mini agenda de barberos
         HorizontalLayout barberoCards = new HorizontalLayout();
         barberoCards.getStyle().set("display", "flex");
         barberoCards.getStyle().set("flex-wrap", "wrap");
@@ -242,6 +254,8 @@ public class BarberiaView extends VerticalLayout {
 
         return layout;
     }
+
+    // 🔽 TODO LO DEMÁS IGUAL (NO SE TOCÓ)
 
     private VerticalLayout crearTarjetaBarbero(Barbero barbero) {
         H4 nombre = new H4(barbero.getNombre());

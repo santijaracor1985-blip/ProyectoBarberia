@@ -3,13 +3,15 @@ package com.example.application.models;
 public class Factura {
 
     private String cliente;
+    private String sexo; // NUEVO
     private String servicio;
     private String barbero;
     private double precio;
     private String fecha;
 
-    public Factura(String cliente, String servicio, String barbero, double precio, String fecha) {
+    public Factura(String cliente, String sexo, String servicio, String barbero, double precio, String fecha) {
         this.cliente = cliente;
+        this.sexo = sexo;
         this.servicio = servicio;
         this.barbero = barbero;
         this.precio = precio;
@@ -22,6 +24,7 @@ public class Factura {
                "<hr style='border:1px solid gray'>" +
 
                "<p><b>Cliente:</b> " + cliente + "</p>" +
+               "<p><b>Sexo:</b> " + sexo + "</p>" + // NUEVO
                "<p><b>Barbero:</b> " + barbero + "</p>" +
                "<p><b>Servicio:</b> " + servicio + "</p>" +
                "<p><b>Fecha:</b> " + fecha + "</p>" +

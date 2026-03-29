@@ -37,31 +37,36 @@ public class CitaService implements Agendable {
         return disponibles;
     }
 
-    public Factura agendar(String nombre, String telefono, String tipo, LocalDateTime fechaHora) {
+   public Factura agendar(String nombre, String telefono, String sexo, String tipo, LocalDateTime fechaHora) {
 
-        if (nombre == null || nombre.isEmpty())
-            throw new RuntimeException("Nombre requerido");
+    if (nombre == null || nombre.isEmpty())
+        throw new RuntimeException("Nombre requerido");
 
-        Servicio servicio = obtenerServicio(tipo);
-        Barbero barbero = buscarBarberoDisponible(tipo, fechaHora);
+    if (sexo == null || sexo.isEmpty())
+        throw new RuntimeException("Sexo requerido");
 
-        if (barbero == null)
-            throw new RuntimeException("No hay barberos disponibles en esa fecha y hora");
+    Servicio servicio = obtenerServicio(tipo);
+    Barbero barbero = buscarBarberoDisponible(tipo, fechaHora);
 
-        Cliente cliente = new Cliente(nombre, telefono);
-        Cita cita = new Cita(cliente, barbero, servicio, fechaHora);
-        citas.add(cita);
+    if (barbero == null)
+        throw new RuntimeException("No hay barberos disponibles en esa fecha y hora");
 
-        Factura factura = new Factura(
-                cliente.getNombre(),
-                servicio.getNombre(),
-                barbero.getNombre(),
-                servicio.getPrecio(),
-                fechaHora.toString()
-        );
-        facturas.add(factura);
-        return factura;
-    }
+    Cliente cliente = new Cliente(nombre, telefono, sexo);
+    Cita cita = new Cita(cliente, barbero, servicio, fechaHora);
+    citas.add(cita);
+
+    Factura factura = new Factura(
+            cliente.getNombre(),
+            cliente.getSexo(),
+            servicio.getNombre(),
+            barbero.getNombre(),
+            servicio.getPrecio(),
+            fechaHora.toString()
+    );
+
+    facturas.add(factura);
+    return factura;
+}
 
     private Servicio obtenerServicio(String tipo) {
         switch (tipo) {
