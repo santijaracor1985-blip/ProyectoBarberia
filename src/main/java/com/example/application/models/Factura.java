@@ -3,7 +3,7 @@ package com.example.application.models;
 public class Factura {
 
     private String cliente;
-    private String sexo; // NUEVO
+    private String sexo; 
     private String servicio;
     private String barbero;
     private double precio;
@@ -24,7 +24,7 @@ public class Factura {
                "<hr style='border:1px solid gray'>" +
 
                "<p><b>Cliente:</b> " + cliente + "</p>" +
-               "<p><b>Sexo:</b> " + sexo + "</p>" + // NUEVO
+               "<p><b>Sexo:</b> " + sexo + "</p>" + 
                "<p><b>Barbero:</b> " + barbero + "</p>" +
                "<p><b>Servicio:</b> " + servicio + "</p>" +
                "<p><b>Fecha:</b> " + fecha + "</p>" +

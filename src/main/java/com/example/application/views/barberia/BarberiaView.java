@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import com.example.application.models.Barbero;
@@ -113,7 +114,6 @@ public class BarberiaView extends VerticalLayout {
         TextField nombre = new TextField("Nombre");
         nombre.setWidthFull();
 
-        // 🔥 NUEVO: SEXO
         ComboBox<String> sexo = new ComboBox<>("Sexo");
         sexo.setItems("Masculino", "Femenino", "Otro");
         sexo.setWidthFull();
@@ -122,7 +122,7 @@ public class BarberiaView extends VerticalLayout {
         servicios.setSpacing(true);
 
         String[] tipos = {"corte","barba","cejas","tinte","freestyle"};
-        final String[] seleccionado = {null};
+        final List<String> seleccionados = new ArrayList<>();
 
         ComboBox<Barbero> barberoBox = new ComboBox<>("Barbero");
         barberoBox.setWidthFull();
@@ -139,13 +139,19 @@ public class BarberiaView extends VerticalLayout {
                 .set("cursor", "pointer");
 
             chip.addClickListener(e -> {
-                seleccionado[0] = tipo;
-                servicios.getChildren().forEach(c -> 
-                    c.getElement().getStyle().set("background", "#1e293b")
-                );
-                chip.getStyle().set("background", "#D4AF37").set("color", "black");
 
-                List<Barbero> lista = servicio.obtenerBarberosPorServicio(tipo);
+                if (seleccionados.contains(tipo)) {
+                    seleccionados.remove(tipo);
+                    chip.getStyle().set("background", "#1e293b").set("color", "#e2e8f0");
+                } else {
+                    seleccionados.add(tipo);
+                    chip.getStyle().set("background", "#D4AF37").set("color", "black");
+                }
+
+                List<Barbero> lista = servicio.obtenerBarberos().stream()
+                    .filter(b -> b.getEspecialidades().containsAll(seleccionados))
+                    .collect(Collectors.toList());
+
                 barberoBox.setItems(lista);
 
                 if (lista.isEmpty()) Notification.show("❌ No hay barberos disponibles");
@@ -171,8 +177,9 @@ public class BarberiaView extends VerticalLayout {
 
         btn.addClickListener(e -> {
             try {
-                if (seleccionado[0] == null) {
-                    Notification.show("Selecciona un servicio");
+
+                if (seleccionados.isEmpty()) {
+                    Notification.show("Selecciona al menos un servicio");
                     return;
                 }
 
@@ -181,9 +188,18 @@ public class BarberiaView extends VerticalLayout {
                     return;
                 }
 
-                // 🔥 VALIDACIÓN SEXO
                 if (sexo.getValue() == null) {
                     Notification.show("Selecciona el sexo");
+                    return;
+                }
+
+                if (hora.getValue() == null) {
+                    Notification.show("Selecciona la hora");
+                    return;
+                }
+
+                if (fechaGlobal.getValue() == null) {
+                    Notification.show("Selecciona la fecha");
                     return;
                 }
 
@@ -195,23 +211,25 @@ public class BarberiaView extends VerticalLayout {
                 servicio.agendar(
                     nombre.getValue(),
                     "000",
-                    sexo.getValue(), // 🔥 NUEVO
-                    seleccionado[0],
-                    fechaHora
-                );
+                    sexo.getValue(),
+                    String.join(", ", seleccionados),
+                    fechaHora,
+                    barberoBox.getValue() 
+                          );
 
                 Notification.show("✅ Cita agendada");
 
                 mostrarAgenda();
 
             } catch (Exception ex) {
-                Notification.show(ex.getMessage());
+                ex.printStackTrace();
+                Notification.show("Error: " + ex.getMessage());
             }
         });
 
         FormLayout form = new FormLayout(
             nombre,
-            sexo, // 🔥 NUEVO
+            sexo,
             new Div(new Span("Servicio"), servicios),
             barberoBox,
             fechaGlobal,
@@ -254,8 +272,6 @@ public class BarberiaView extends VerticalLayout {
 
         return layout;
     }
-
-    // 🔽 TODO LO DEMÁS IGUAL (NO SE TOCÓ)
 
     private VerticalLayout crearTarjetaBarbero(Barbero barbero) {
         H4 nombre = new H4(barbero.getNombre());
@@ -324,7 +340,6 @@ public class BarberiaView extends VerticalLayout {
         return t;
     }
 
-    // 🧾 FACTURAS
     private void mostrarFacturas() {
         contenido.removeAll();
 
@@ -345,7 +360,6 @@ public class BarberiaView extends VerticalLayout {
         contenido.add(new VerticalLayout(new H2("Facturas"), grid));
     }
 
-    // 🖼️ GALERÍA PREMIUM DE CORTES
     private void mostrarGaleria() {
         contenido.removeAll();
 

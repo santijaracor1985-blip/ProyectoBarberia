@@ -37,36 +37,59 @@ public class CitaService implements Agendable {
         return disponibles;
     }
 
-   public Factura agendar(String nombre, String telefono, String sexo, String tipo, LocalDateTime fechaHora) {
+    // 🔥 MÉTODO CORREGIDO
+    public Factura agendar(String nombre, String telefono, String sexo, String tipo, LocalDateTime fechaHora, Barbero barbero) {
 
-    if (nombre == null || nombre.isEmpty())
-        throw new RuntimeException("Nombre requerido");
+        if (nombre == null || nombre.isEmpty())
+            throw new RuntimeException("Nombre requerido");
 
-    if (sexo == null || sexo.isEmpty())
-        throw new RuntimeException("Sexo requerido");
+        if (sexo == null || sexo.isEmpty())
+            throw new RuntimeException("Sexo requerido");
 
-    Servicio servicio = obtenerServicio(tipo);
-    Barbero barbero = buscarBarberoDisponible(tipo, fechaHora);
+        if (barbero == null)
+            throw new RuntimeException("Barbero requerido");
 
-    if (barbero == null)
-        throw new RuntimeException("No hay barberos disponibles en esa fecha y hora");
+        // 🔥 servicios seleccionados
+        String tipoOriginal = tipo;
+        String[] tipos = tipoOriginal.split(", ");
 
-    Cliente cliente = new Cliente(nombre, telefono, sexo);
-    Cita cita = new Cita(cliente, barbero, servicio, fechaHora);
-    citas.add(cita);
+        // 🔥 calcular total
+        double total = 0;
+        for (String t : tipos) {
+            total += obtenerServicio(t).getPrecio();
+        }
 
-    Factura factura = new Factura(
-            cliente.getNombre(),
-            cliente.getSexo(),
-            servicio.getNombre(),
-            barbero.getNombre(),
-            servicio.getPrecio(),
-            fechaHora.toString()
-    );
+        // 🔥 usar uno solo internamente
+        if (tipo.contains(",")) {
+            tipo = tipo.split(", ")[0];
+        }
 
-    facturas.add(factura);
-    return factura;
-}
+        Servicio servicio = obtenerServicio(tipo);
+
+        // 🔥 validar si el barbero está ocupado
+        boolean ocupado = citas.stream()
+                .anyMatch(c -> c.getBarbero().equals(barbero) &&
+                               c.getFechaHora().equals(fechaHora));
+
+        if (ocupado)
+            throw new RuntimeException("El barbero ya tiene una cita en esa hora");
+
+        Cliente cliente = new Cliente(nombre, telefono, sexo);
+        Cita cita = new Cita(cliente, barbero, servicio, fechaHora);
+        citas.add(cita);
+
+        Factura factura = new Factura(
+                cliente.getNombre(),
+                cliente.getSexo(),
+                tipoOriginal,
+                barbero.getNombre(),
+                total,
+                fechaHora.toString()
+        );
+
+        facturas.add(factura);
+        return factura;
+    }
 
     private Servicio obtenerServicio(String tipo) {
         switch (tipo) {
@@ -77,16 +100,6 @@ public class CitaService implements Agendable {
             case "freestyle": return new Servicio("Freestyle", 30, 20000, "freestyle");
             default: throw new RuntimeException("Servicio no válido");
         }
-    }
-
-    private Barbero buscarBarberoDisponible(String tipo, LocalDateTime fechaHora) {
-        for (Barbero b : barberos) {
-            boolean ocupado = citas.stream()
-                    .anyMatch(c -> c.getBarbero().equals(b) &&
-                                   c.getFechaHora().equals(fechaHora));
-            if (b.puedeHacer(tipo) && !ocupado) return b;
-        }
-        return null;
     }
 
     @Override
