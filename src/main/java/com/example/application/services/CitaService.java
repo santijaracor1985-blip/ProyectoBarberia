@@ -64,7 +64,7 @@ public class CitaService implements Agendable {
         double total = 0;
         List<Servicio> servicios = new ArrayList<>();
 
-        // 🔥 ÚNICO CAMBIO: trim()
+       
         for(String t : tipos){
             total += obtenerServicio(t.trim()).getPrecio();
         }
@@ -96,11 +96,11 @@ public class CitaService implements Agendable {
     private Servicio obtenerServicio(String tipo) {
 
         switch(tipo){
-            case "corte": return new Servicio("Corte", 30, 10000, "corte");
+            case "corte": return new Servicio("Corte", 30, 17000, "corte");
             case "barba": return new Servicio("Barba", 30, 8000, "barba");
             case "cejas": return new Servicio("Cejas", 30, 5000, "cejas");
-            case "tinte": return new Servicio("Tinte", 30, 5000, "tinte");
-            case "freestyle": return new Servicio("Freestyle", 30, 5000, "freestyle");
+            case "tinte": return new Servicio("Tinte", 30, 30000, "tinte");
+            case "freestyle": return new Servicio("Freestyle", 30, 22000, "freestyle");
             default:
                 throw new RuntimeException("Servicio no valido");
         }
