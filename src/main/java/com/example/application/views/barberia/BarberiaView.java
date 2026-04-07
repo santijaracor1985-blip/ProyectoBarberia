@@ -408,11 +408,11 @@ public class BarberiaView extends VerticalLayout {
         galeria.setWidthFull();
 
         String[] ejemplosUrls = {
-            "https://i.imgur.com/3ZQ3Z4L.jpg",
-            "https://i.imgur.com/JQ9Z4ZT.jpg",
-            "https://i.imgur.com/8Km9tLL.jpg",
-            "https://i.imgur.com/W1T7CXd.jpg",
-            "https://i.imgur.com/kpXZP0N.jpg"
+            "https://i.pinimg.com/originals/bc/78/8a/bc788a2992ae8ebb335434b19b92738f.jpg",
+            "https://i.pinimg.com/originals/88/54/7c/88547c9dd7264aa49958979cb4ae4e63.jpg",
+            "https://tse1.explicit.bing.net/th/id/OIP.lqQQ4GhNvkKXLEpk9x_hXAHaHh?rs=1&pid=ImgDetMain&o=7&rm=3",
+            "https://i.pinimg.com/originals/b2/cf/95/b2cf95a55d0b602cac6ed53b8eae18f2.jpg",
+            
         };
 
         for (String url : ejemplosUrls) {

@@ -13,15 +13,19 @@ import com.example.application.models.Factura;
 import com.example.application.models.Servicio;
 
 public class CitaService implements Agendable {
+
     private List<Cita> citas = new ArrayList<>();
     private List<Factura> facturas = new ArrayList<>();
     private List<Barbero> barberos = new ArrayList<>();
 
     public CitaService() {
+
         barberos.add(new Barbero("Carlos Freestyle", "111", List.of("freestyle")));
-        barberos.add(new Barbero("Andrés Clásico", "222", List.of("corte")));
+        barberos.add(new Barbero("Andrés Clasico", "222", List.of("corte")));
         barberos.add(new Barbero("Luis Colorista", "333", List.of("tinte")));
+        barberos.add(new Barbero("Miguel Full", "444", List.of("corte","barba","cejas")));
     }
+
     public List<Cita> obtenerCitas() {
         return citas;
     }
@@ -42,7 +46,9 @@ public class CitaService implements Agendable {
         return disponibles;
     }
 
-    public Factura agendar(String nombre, String telefono, String sexo, String tipo, LocalDateTime fechaHora, Barbero barbero) {
+    public Factura agendar(String nombre, String telefono, String sexo,
+                           String tipo, LocalDateTime fechaHora, Barbero barbero) {
+
         if(nombre == null || nombre.isEmpty())
             throw new RuntimeException("Nombre requerido");
 
@@ -56,18 +62,16 @@ public class CitaService implements Agendable {
         String [] tipos = tipo.split(",");
 
         double total = 0;
-        for(String t : tipos){
-            total += obtenerServicio(t).getPrecio();
-        }
-
         List<Servicio> servicios = new ArrayList<>();
+
+        // 🔥 ÚNICO CAMBIO: trim()
         for(String t : tipos){
-        servicios.add(obtenerServicio(t));
+            total += obtenerServicio(t.trim()).getPrecio();
         }
 
         boolean ocupado = citas.stream()
-                      .anyMatch(c -> c.getBarbero().equals(barbero) && 
-                      c.getFechaHora().equals(fechaHora));
+                .anyMatch(c -> c.getBarbero().equals(barbero) &&
+                        c.getFechaHora().equals(fechaHora));
 
         if(ocupado)
             throw new RuntimeException("El barbero ya tiene una cita a esa hora");
@@ -77,28 +81,31 @@ public class CitaService implements Agendable {
         citas.add(cita);
 
         Factura factura = new Factura(
-              cliente.getNombre(),
-              cliente.getSexo(),
-              TipoOriginal,
-              barbero.getNombre(),
-              total,
-              fechaHora.toString()
+                cliente.getNombre(),
+                cliente.getSexo(),
+                TipoOriginal,
+                barbero.getNombre(),
+                total,
+                fechaHora.toString()
         );
+
         facturas.add(factura);
         return factura;
     }
 
     private Servicio obtenerServicio(String tipo) {
+
         switch(tipo){
             case "corte": return new Servicio("Corte", 30, 10000, "corte");
             case "barba": return new Servicio("Barba", 30, 8000, "barba");
             case "cejas": return new Servicio("Cejas", 30, 5000, "cejas");
-            case "tinte": return new Servicio("Tinte", 30, 20000, "tinte");
-            case "frestyle": return new Servicio("Frestyle", 30, 30000, "frestyle");
-            default: 
-            throw new RuntimeException("Servicio no valido");
+            case "tinte": return new Servicio("Tinte", 30, 5000, "tinte");
+            case "freestyle": return new Servicio("Freestyle", 30, 5000, "freestyle");
+            default:
+                throw new RuntimeException("Servicio no valido");
         }
     }
+
     @Override
     public void agendarCita(Cita cita) {
         citas.add(cita);
