@@ -38,8 +38,7 @@ public class BarberiaView extends VerticalLayout {
     private DatePicker fechaGlobal = new DatePicker("Fecha");
 
     public BarberiaView() {
-        // --- 1. CORRECCIÓN DE FONDO GLOBAL ---
-        // Forzamos al HTML y al BODY a tener el fondo oscuro para evitar el espacio blanco
+      
         UI.getCurrent().getElement().executeJs(
             "document.documentElement.style.backgroundColor = '#020617';" +
             "document.body.style.backgroundColor = '#020617';"
@@ -50,7 +49,7 @@ public class BarberiaView extends VerticalLayout {
         setSpacing(false);
         getElement().getThemeList().add("dark");
 
-        // Estilo del layout principal con degradado fijo
+        
         getStyle()
             .set("background", "linear-gradient(135deg,#0f172a,#020617)")
             .set("background-attachment", "fixed")
@@ -63,7 +62,7 @@ public class BarberiaView extends VerticalLayout {
         contenido.setWidthFull();
         contenido.getStyle()
             .set("padding", "30px")
-            .set("flex-grow", "1"); // Empuja el fondo hacia abajo
+            .set("flex-grow", "1"); 
 
         fechaGlobal.setValue(LocalDate.now());
         fechaGlobal.addValueChangeListener(e -> mostrarAgenda());

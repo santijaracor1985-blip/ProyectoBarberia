@@ -1,8 +1,8 @@
 package com.example.application.models;
 
 public class Persona {
-    protected String nombre;
-    protected String telefono;
+    private String nombre;
+    private String telefono;
 
     public Persona(String nombre, String telefono) {
         this.nombre = nombre;

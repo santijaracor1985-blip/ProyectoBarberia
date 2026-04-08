@@ -33,7 +33,7 @@ public class CitaService implements Agendable {
     public List<Factura> obtenerFacturas() {
         return facturas;
     }
-
+   
     public List<Barbero> obtenerBarberos() {
         return barberos;
     }
