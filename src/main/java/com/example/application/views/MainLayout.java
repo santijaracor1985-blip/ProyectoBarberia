@@ -25,7 +25,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private H1 viewTitle;
 
     public MainLayout() {
-        // 🔥 Quitamos el drawer completamente
+        
         addHeaderContent();
     }
 
