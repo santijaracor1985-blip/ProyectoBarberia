@@ -24,11 +24,15 @@ public class Factura {
                "<hr style='border:1px solid gray'>" +
 
                "<p><b>Cliente:</b> " + cliente + "</p>" +
+               "<p><b>Sexo:</b> " + sexo + "</p>" + 
+               "<p><b>Barbero:</b> " + barbero + "</p>" +
                "<p><b>Servicio:</b> " + servicio + "</p>" +
+               "<p><b>Fecha:</b> " + fecha + "</p>" +
 
                "<h3 style='color:#00ffcc'>Total: $" + precio + "</h3>" +
 
                "<hr style='border:1px solid gray'>" +
+               "<p style='text-align:center'>Gracias por tu visita ✂️</p>" +
                "</div>";
     }
 
